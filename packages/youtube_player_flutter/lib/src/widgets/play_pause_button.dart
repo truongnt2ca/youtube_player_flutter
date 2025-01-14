@@ -47,9 +47,9 @@ class _PlayPauseButtonState extends State<PlayPauseButton>
     final controller = YoutubePlayerController.of(context);
     if (controller == null) {
       assert(
-        widget.controller != null,
-        '\n\nNo controller could be found in the provided context.\n\n'
-        'Try passing the controller explicitly.',
+      widget.controller != null,
+      '\n\nNo controller could be found in the provided context.\n\n'
+          'Try passing the controller explicitly.',
       );
       _controller = widget.controller!;
     } else {
@@ -93,15 +93,41 @@ class _PlayPauseButtonState extends State<PlayPauseButton>
         visible: visible,
         child: Material(
           color: Colors.transparent,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(50.0),
-            onTap: () => _togglePlayPause(state),
-            child: AnimatedIcon(
-              icon: AnimatedIcons.play_pause,
-              progress: _animController.view,
-              color: Colors.white,
-              size: 60.0,
-            ),
+          child: Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children:[
+                Spacer(),
+                InkWell(
+                    borderRadius: BorderRadius.circular(50.0),
+                    onTap: () => _rewind10Seconds(),
+                    child:const Icon(
+                        Icons.replay_10,
+                        size: 50.0,
+                        color: Colors.white)
+                ),
+                const SizedBox(width: 32),
+                InkWell(
+                  borderRadius: BorderRadius.circular(50.0),
+                  onTap: () => _togglePlayPause(state),
+                  child: AnimatedIcon(
+                    icon: AnimatedIcons.play_pause,
+                    progress: _animController.view,
+                    color: Colors.white,
+                    size: 60.0,
+                  ),
+                ),
+                const SizedBox(width: 32),
+                InkWell(
+                  borderRadius: BorderRadius.circular(50.0),
+                  onTap: ()=> _forward10Seconds(),
+                  child: const Icon(
+                      Icons.forward_10,
+                      size: 50.0,
+                      color: Colors.white),
+                ),
+                Spacer(),
+              ]
           ),
         ),
       );
@@ -118,6 +144,23 @@ class _PlayPauseButtonState extends State<PlayPauseButton>
 
   void _togglePlayPause(PlayerState state) {
     state == PlayerState.playing ? _controller.pause() : _controller.play();
+  }
+
+  void _forward10Seconds() {
+    final currentPosition = _controller.value.position;
+    final newPosition = currentPosition + const Duration(seconds: 10);
+    _controller.seekTo(newPosition);
+  }
+
+  // Hàm quay lại 10s
+  void _rewind10Seconds() {
+    final currentPosition = _controller.value.position;
+    final newPosition = currentPosition - const Duration(seconds: 10);
+    if (newPosition.inSeconds < 0) {
+      _controller.seekTo(Duration.zero); // Nếu thời gian âm, đưa về đầu video
+    } else {
+      _controller.seekTo(newPosition);
+    }
   }
 
   bool _showPlayPause(PlayerState state) {

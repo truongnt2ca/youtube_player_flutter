@@ -297,21 +297,21 @@ class YoutubePlayerController extends ValueNotifier<YoutubePlayerValue> {
 
   /// Resets the value of [YoutubePlayerController].
   void reset() => updateValue(
-        value.copyWith(
-          isReady: false,
-          isFullScreen: false,
-          isControlsVisible: false,
-          playerState: PlayerState.unknown,
-          hasPlayed: false,
-          position: Duration.zero,
-          buffered: 0.0,
-          errorCode: 0,
-          isLoaded: false,
-          isPlaying: false,
-          isDragging: false,
-          metaData: const YoutubeMetaData(),
-        ),
-      );
+    value.copyWith(
+      isReady: false,
+      isFullScreen: false,
+      isControlsVisible: false,
+      playerState: PlayerState.unknown,
+      hasPlayed: false,
+      position: Duration.zero,
+      buffered: 0.0,
+      errorCode: 0,
+      isLoaded: false,
+      isPlaying: false,
+      isDragging: false,
+      metaData: const YoutubeMetaData(),
+    ),
+  );
 
   @override
   void dispose() {

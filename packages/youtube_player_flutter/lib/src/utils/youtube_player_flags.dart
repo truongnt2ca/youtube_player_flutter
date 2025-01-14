@@ -4,6 +4,12 @@
 
 /// Defines player flags for [YoutubePlayer].
 class YoutubePlayerFlags {
+  /// If set to true, hides the enter full screen button.
+  ///
+  /// Default is false
+  final bool hideEnterFullScreen;
+
+
   /// If set to true, hides the controls.
   ///
   /// Default is false.
@@ -81,6 +87,7 @@ class YoutubePlayerFlags {
 
   /// Creates [YoutubePlayerFlags].
   const YoutubePlayerFlags({
+    this.hideEnterFullScreen = false,
     this.hideControls = false,
     this.controlsVisibleAtStart = false,
     this.autoPlay = true,
@@ -100,6 +107,7 @@ class YoutubePlayerFlags {
 
   /// Copies new values assigned to the [YoutubePlayerFlags].
   YoutubePlayerFlags copyWith({
+    bool? hideEnterFullScreen,
     bool? hideControls,
     bool? autoPlay,
     bool? mute,
@@ -124,6 +132,7 @@ class YoutubePlayerFlags {
       enableCaption: enableCaption ?? this.enableCaption,
       hideControls: hideControls ?? this.hideControls,
       hideThumbnail: hideThumbnail ?? this.hideThumbnail,
+      hideEnterFullScreen: hideEnterFullScreen ?? this.hideEnterFullScreen,
       isLive: isLive ?? this.isLive,
       loop: loop ?? this.loop,
       mute: mute ?? this.mute,
@@ -131,10 +140,10 @@ class YoutubePlayerFlags {
       startAt: startAt ?? this.startAt,
       endAt: endAt ?? this.endAt,
       controlsVisibleAtStart:
-          controlsVisibleAtStart ?? this.controlsVisibleAtStart,
+      controlsVisibleAtStart ?? this.controlsVisibleAtStart,
       useHybridComposition: useHybridComposition ?? this.useHybridComposition,
       showLiveFullscreenButton:
-          showLiveFullscreenButton ?? this.showLiveFullscreenButton,
+      showLiveFullscreenButton ?? this.showLiveFullscreenButton,
     );
   }
 }
