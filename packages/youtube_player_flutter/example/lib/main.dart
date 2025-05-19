@@ -63,9 +63,9 @@ class _MyHomePageState extends State<MyHomePage> {
   double _volume = 100;
   bool _muted = false;
   bool _isPlayerReady = false;
-
+  bool _caption = false;
   final List<String> _ids = [
-    'nPt8bK2gbaU',
+    '-4GmbBoYQjE',
     'gQDByCdjUXw',
     'iLnmTe5Q2Qw',
     '_WoCV4c6XOE',
@@ -87,7 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
         disableDragSeek: false,
         loop: false,
         isLive: false,
-        forceHD: false,
+        forceHD: true,
         enableCaption: true,
       ),
     )..addListener(listener);
@@ -347,6 +347,17 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ],
               ),
+            ),
+            IconButton(
+              icon: Icon(!_caption ? Icons.closed_caption : Icons.closed_caption_disabled_outlined,
+              ),
+              onPressed: _isPlayerReady
+                  ? () { _controller.toggleCaptions(_caption);
+                setState(() {
+                  _caption = !_caption;
+                });
+              }
+                  : null,
             ),
           ],
         ),

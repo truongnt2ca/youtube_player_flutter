@@ -65,38 +65,38 @@ YoutubePlayerController _controller = YoutubePlayerController(
     ),
 );
 
-YoutubePlayer(
-    controller: _controller,
-    showVideoProgressIndicator: true,
-    progressIndicatorColor: Colors.amber,
-    progressColors: const ProgressBarColors(
-      playedColor: Colors.amber,
-      handleColor: Colors.amberAccent,
-    ),
-    onReady: () {
-      _controller.addListener(listener);
-    },
-),
+// YoutubePlayer(
+//     controller: _controller,
+//     showVideoProgressIndicator: true,
+//     progressIndicatorColor: Colors.amber,
+//     progressColors: const ProgressBarColors(
+//       playedColor: Colors.amber,
+//       handleColor: Colors.amberAccent,
+//     ),
+//     onReady: () {
+//       _controller.addListener(listener);
+//     },
+// ),
 ```
 
 #### For FullScreen Support
 If fullscreen support is required, wrap your player with `YoutubePlayerBuilder`
 
 ```dart
-YoutubePlayerBuilder(
-    player: YoutubePlayer(
-        controller: _controller,
-    ),
-    builder: (context, player){
-        return Column(
-            children: [
-                // some widgets
-                player,
-                //some other widgets
-            ],
-        );
-    ),
-),
+// YoutubePlayerBuilder(
+//     player: YoutubePlayer(
+//         controller: _controller,
+//     ),
+//     builder: (context, player){
+//         return Column(
+//             children: [
+//                 // some widgets
+//                 player,
+//                 //some other widgets
+//             ],
+//         );
+//     ),
+// ),
 ```
 
          
@@ -106,17 +106,17 @@ Set the isLive property to true in order to change the UI to match Live Video.
 ![Live UI Demo](misc/live_ui.png) 
 
 ```dart
-YoutubePlayerController _controller = YoutubePlayerController(
-    initialVideoId: 'iLnmTe5Q2Qw',
-    flags: YoutubePLayerFlags(
-      isLive: true,
-    ),
-);
-
-YoutubePlayer(
-    controller: _controller,
-    liveUIColor: Colors.amber,
-),
+// YoutubePlayerController _controller = YoutubePlayerController(
+//     initialVideoId: 'iLnmTe5Q2Qw',
+//     flags: YoutubePLayerFlags(
+//       isLive: true,
+//     ),
+// );
+//
+// YoutubePlayer(
+//     controller: _controller,
+//     liveUIColor: Colors.amber,
+// ),
 ```
 
 ## Want to customize the player?
@@ -131,22 +131,22 @@ YoutubePlayer(
  * ProgressBar
 
 ```dart
-YoutubePlayer(
-    controller: _controller,
-    bottomActions: [
-      CurrentPosition(),
-      ProgressBar(isExpanded: true),
-      TotalDuration(),
-    ],
-),
+// YoutubePlayer(
+//     controller: _controller,
+//     bottomActions: [
+//       CurrentPosition(),
+//       ProgressBar(isExpanded: true),
+//       TotalDuration(),
+//     ],
+// ),
 ```
 
 ## Want to play using Youtube URLs ? 
 The plugin also provides `convertUrlToId()` method that converts youtube links to its corresponding video ids.
 ```dart
-String videoId;
-videoId = YoutubePlayer.convertUrlToId("https://www.youtube.com/watch?v=BBAyRBTfsOU");
-print(videoId); // BBAyRBTfsOU
+// String videoId;
+// videoId = YoutubePlayer.convertUrlToId("https://www.youtube.com/watch?v=BBAyRBTfsOU");
+// print(videoId); // BBAyRBTfsOU
 ```
 
 ## Example

@@ -126,7 +126,7 @@ class _PlayPauseButtonState extends State<PlayPauseButton>
                       size: 50.0,
                       color: Colors.white),
                 ),
-                Spacer(),
+                const Spacer(),
               ]
           ),
         ),

@@ -9,7 +9,6 @@ class YoutubePlayerFlags {
   /// Default is false
   final bool hideEnterFullScreen;
 
-
   /// If set to true, hides the controls.
   ///
   /// Default is false.
@@ -85,6 +84,8 @@ class YoutubePlayerFlags {
   /// Default is true.
   final bool showLiveFullscreenButton;
 
+  final bool showCaptionButton;
+
   /// Creates [YoutubePlayerFlags].
   const YoutubePlayerFlags({
     this.hideEnterFullScreen = false,
@@ -99,6 +100,7 @@ class YoutubePlayerFlags {
     this.captionLanguage = 'en',
     this.loop = false,
     this.forceHD = false,
+    this.showCaptionButton = true,
     this.startAt = 0,
     this.endAt,
     this.useHybridComposition = true,
@@ -124,6 +126,7 @@ class YoutubePlayerFlags {
     bool? controlsVisibleAtStart,
     bool? useHybridComposition,
     bool? showLiveFullscreenButton,
+    bool? showCaptionButton,
   }) {
     return YoutubePlayerFlags(
       autoPlay: autoPlay ?? this.autoPlay,
@@ -140,10 +143,11 @@ class YoutubePlayerFlags {
       startAt: startAt ?? this.startAt,
       endAt: endAt ?? this.endAt,
       controlsVisibleAtStart:
-      controlsVisibleAtStart ?? this.controlsVisibleAtStart,
+          controlsVisibleAtStart ?? this.controlsVisibleAtStart,
       useHybridComposition: useHybridComposition ?? this.useHybridComposition,
       showLiveFullscreenButton:
-      showLiveFullscreenButton ?? this.showLiveFullscreenButton,
+          showLiveFullscreenButton ?? this.showLiveFullscreenButton,
+      showCaptionButton: showCaptionButton ?? this.showCaptionButton,
     );
   }
 }

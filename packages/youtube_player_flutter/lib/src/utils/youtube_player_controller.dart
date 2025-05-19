@@ -188,6 +188,16 @@ class YoutubePlayerController extends ValueNotifier<YoutubePlayerValue> {
   /// Pauses the video.
   void pause() => _callMethod('pause()');
 
+  /// Toggles captions on/off
+  void toggleCaptions(bool enable) {
+    _callMethod('toggleCaptions(${enable ? 'true' : 'false'})');
+  }
+
+  /// Sets subtitle language (e.g. 'en', 'vi', 'ja', ...)
+  void setSubtitleLanguage(String lang) {
+    _callMethod("setSubtitleLanguage('\$lang')");
+  }
+
   /// Loads the video as per the [videoId] provided.
   void load(String videoId, {int startAt = 0, int? endAt}) {
     var loadParams = 'videoId:"$videoId",startSeconds:$startAt';
