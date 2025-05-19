@@ -102,8 +102,9 @@ class _CaptionButtonState extends State<CaptionButton> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  _captionEnabled ? 'Tắt phụ đề' : 'Bật phụ đề',
+                  _tracks.isNotEmpty ? _captionEnabled ? 'Tắt phụ đề' : 'Bật phụ đề' : 'Video này không có phụ đề',
                   style: TextStyle(fontSize: 12),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -114,7 +115,7 @@ class _CaptionButtonState extends State<CaptionButton> {
             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             child: Row(
               children: [
-                Icon(Icons.language, size: 18),
+                Icon(Icons.language, size: 18, color: _tracks.isEmpty ? Colors.grey: Colors.black,),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -122,7 +123,7 @@ class _CaptionButtonState extends State<CaptionButton> {
                     // nếu displayName null thì dùng chuỗi mặc định
                         ? (_currentLanguage['displayName'] as String? ?? 'Chọn ngôn ngữ')
                         : 'Chọn ngôn ngữ',
-                    style: TextStyle(fontSize: 12),
+                    style: TextStyle(fontSize: 12, color: _tracks.isEmpty ? Colors.grey: Colors.black,),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -132,70 +133,74 @@ class _CaptionButtonState extends State<CaptionButton> {
         ],
         onSelected: (idx) async {
           if (idx == 0) {
-            _controller.toggleCaptions(enable: !_captionEnabled, currentLanguage: _currentLanguage);
-            setState(() => _captionEnabled = !_captionEnabled);
-          } else {
-            if (_tracks.isEmpty && !_loadingTracks) {
-              setState(() => _loadingTracks = true);
-              _tracks = await _controller.getCaptionTrackList();
-              // pick ra các ngôn ngữ theo pref
-              for (var code in pref) {
-                final match = _tracks.where((t) => t['languageCode'] == code);
-                ordered.addAll(match);
-              }
-// phần còn lại
-              for (var t in _tracks) {
-                if (!pref.contains(t['languageCode'])) others.add(t);
-              }
-// có thể sort others theo displayName nếu muốn alphabet
-              others.sort((a, b) {
-                final na = (a['displayName'] ?? a['languageName']) as String;
-                final nb = (b['displayName'] ?? b['languageName']) as String;
-                return na.compareTo(nb);
-              });
-
-              _tracks = [...ordered, ...others];
-              setState(() => _loadingTracks = false);
+            if(_tracks.isNotEmpty){
+              _controller.toggleCaptions(enable: !_captionEnabled, currentLanguage: _currentLanguage);
+              setState(() => _captionEnabled = !_captionEnabled);
             }
-            final selected = await showMenu<Map<String,dynamic>>(
-              context: context,
-              position: RelativeRect.fromLTRB(
-                MediaQuery.of(context).size.width - 100,
-                kToolbarHeight + 250,
-                16,
-                0,
-              ),
-              constraints: BoxConstraints(maxHeight: 200),
-              items: _tracks.map((track) {
-                final name = track['displayName'] ?? track['languageName'];
-                final isCurrent = _currentLanguage['languageCode'] == track['languageCode'];
-                return PopupMenuItem(
-                  value: track,
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  child: Row(
-                    children: [
-                      if (isCurrent)
-                        Icon(Icons.check, size: 16, color: Colors.blue),
-                      if (isCurrent)
-                        const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          name,
-                          style: TextStyle(fontSize: 12),
-                          overflow: TextOverflow.ellipsis,
+          } else {
+            if(_tracks.isNotEmpty){
+              if (_tracks.isEmpty && !_loadingTracks) {
+                setState(() => _loadingTracks = true);
+                _tracks = await _controller.getCaptionTrackList();
+                // pick ra các ngôn ngữ theo pref
+                for (var code in pref) {
+                  final match = _tracks.where((t) => t['languageCode'] == code);
+                  ordered.addAll(match);
+                }
+// phần còn lại
+                for (var t in _tracks) {
+                  if (!pref.contains(t['languageCode'])) others.add(t);
+                }
+// có thể sort others theo displayName nếu muốn alphabet
+                others.sort((a, b) {
+                  final na = (a['displayName'] ?? a['languageName']) as String;
+                  final nb = (b['displayName'] ?? b['languageName']) as String;
+                  return na.compareTo(nb);
+                });
+
+                _tracks = [...ordered, ...others];
+                setState(() => _loadingTracks = false);
+              }
+              final selected = await showMenu<Map<String,dynamic>>(
+                context: context,
+                position: RelativeRect.fromLTRB(
+                  MediaQuery.of(context).size.width - 100,
+                  kToolbarHeight + 250,
+                  16,
+                  0,
+                ),
+                constraints: BoxConstraints(maxHeight: 200),
+                items: _tracks.map((track) {
+                  final name = track['displayName'] ?? track['languageName'];
+                  final isCurrent = _currentLanguage['languageCode'] == track['languageCode'];
+                  return PopupMenuItem(
+                    value: track,
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    child: Row(
+                      children: [
+                        if (isCurrent)
+                          Icon(Icons.check, size: 16, color: Colors.blue),
+                        if (isCurrent)
+                          const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            name,
+                            style: TextStyle(fontSize: 12),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            );
-            if (selected != null) {
-              _controller.setCaptionTrack(selected);
-              setState(() {
-                _captionEnabled = true;
-                _currentLanguage = selected;
-              });
+                      ],
+                    ),
+                  );
+                }).toList(),
+              );
+              if (selected != null) {
+                _controller.setCaptionTrack(selected);
+                setState(() {
+                  _captionEnabled = true;
+                  _currentLanguage = selected;
+                });
+              }
             }
           }
         },
