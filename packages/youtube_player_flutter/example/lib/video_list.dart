@@ -24,6 +24,9 @@ class _VideoListState extends State<VideoList> {
         (videoId) => YoutubePlayerController(
           initialVideoId: videoId,
           flags: const YoutubePlayerFlags(
+            showCaptionButton: true,
+            enableCaption: true,
+            hideEnterFullScreen: true,
             autoPlay: false,
           ),
         ),

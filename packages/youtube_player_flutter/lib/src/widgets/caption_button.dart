@@ -27,8 +27,13 @@ class CaptionButton extends StatefulWidget {
 
 class _CaptionButtonState extends State<CaptionButton> {
   late YoutubePlayerController _controller;
-  bool _caption = false;
-
+  bool _captionEnabled = true;
+  List<Map<String, dynamic>> _tracks = [];
+  bool _loadingTracks = false;
+  Map<String, dynamic> _currentLanguage = {};
+  final others = <Map<String,dynamic>>[];
+  final ordered = <Map<String,dynamic>>[];
+  final pref = ['vi', 'en', 'ja'];
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -59,55 +64,142 @@ class _CaptionButtonState extends State<CaptionButton> {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: Icon(
-        !_caption
-            ? Icons.closed_caption
-            : Icons.closed_caption_disabled_outlined,
-        color: widget.color,
-      ),
-      onPressed: () {
-        _controller.toggleCaptions(_caption);
-        setState(() {
-          _caption = !_caption;
-        });
-      },
-    );
+    return
+        //   IconButton(
+        //   icon: Icon(
+        //     !_caption
+        //         ? Icons.closed_caption
+        //         : Icons.closed_caption_disabled_outlined,
+        //     color: widget.color,
+        //   ),
+        //   onPressed: () {
+        //     _controller.toggleCaptions(_caption);
+        //     setState(() {
+        //       _caption = !_caption;
+        //     });
+        //   },
+        // );
+      PopupMenuButton<int>(
+        icon: Icon(
+          _captionEnabled
+              ? Icons.closed_caption
+              : Icons.closed_caption_off,
+          color: Colors.white,
+          size: 20,
+        ),
+        padding: EdgeInsets.zero,
+        itemBuilder: (context) => [
+          PopupMenuItem(
+            value: 0,
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            child: Row(
+              children: [
+                Icon(
+                  _captionEnabled
+                      ? Icons.closed_caption
+                      : Icons.closed_caption_disabled_outlined,
+                  size: 18,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  _captionEnabled ? 'Tắt phụ đề' : 'Bật phụ đề',
+                  style: TextStyle(fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+          const PopupMenuDivider(height: 4),
+          PopupMenuItem(
+            value: 1,
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            child: Row(
+              children: [
+                Icon(Icons.language, size: 18),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    _captionEnabled
+                    // nếu displayName null thì dùng chuỗi mặc định
+                        ? (_currentLanguage['displayName'] as String? ?? 'Chọn ngôn ngữ')
+                        : 'Chọn ngôn ngữ',
+                    style: TextStyle(fontSize: 12),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+        onSelected: (idx) async {
+          if (idx == 0) {
+            _controller.toggleCaptions(enable: !_captionEnabled, currentLanguage: _currentLanguage);
+            setState(() => _captionEnabled = !_captionEnabled);
+          } else {
+            if (_tracks.isEmpty && !_loadingTracks) {
+              setState(() => _loadingTracks = true);
+              _tracks = await _controller.getCaptionTrackList();
+              // pick ra các ngôn ngữ theo pref
+              for (var code in pref) {
+                final match = _tracks.where((t) => t['languageCode'] == code);
+                ordered.addAll(match);
+              }
+// phần còn lại
+              for (var t in _tracks) {
+                if (!pref.contains(t['languageCode'])) others.add(t);
+              }
+// có thể sort others theo displayName nếu muốn alphabet
+              others.sort((a, b) {
+                final na = (a['displayName'] ?? a['languageName']) as String;
+                final nb = (b['displayName'] ?? b['languageName']) as String;
+                return na.compareTo(nb);
+              });
 
-    // PopupMenuButton<int>(
-    //   icon: Icon(_captionEnabled ? Icons.closed_caption : Icons.closed_caption_disabled, color: widget.color),
-    //   onSelected: (value) async {
-    //     if (value == 0) {
-    //       // toggle cc
-    //       _controller.toggleCaptions(!_captionEnabled);
-    //       setState(() => _captionEnabled = !_captionEnabled);
-    //     } else if (value == 1) {
-    //       // chọn ngôn ngữ
-    //       final lang = await showMenu<String>(
-    //         context: context,
-    //         position: RelativeRect.fill,
-    //         items: ['en','vi','ja','es'].map((l) {
-    //           return PopupMenuItem(value: l, child: Text(l));
-    //         }).toList(),
-    //       );
-    //       if (lang != null) {
-    //         // reload video với ngôn ngữ mới
-    //         await _controller.value.webViewController?.evaluateJavascript(source: """
-    //       player.loadVideoById({
-    //         videoId: '${_controller.initialVideoId}',
-    //         startSeconds: ${_controller.value.position.inSeconds},
-    //         cc_load_policy: 1,
-    //         cc_lang_pref: '$lang'
-    //       });
-    //     """);
-    //         setState(() => _currentLang = lang);
-    //       }
-    //     }
-    //   },
-    //   itemBuilder: (_) => [
-    //     PopupMenuItem(value: 0, child: Text(_captionEnabled ? 'Tắt phụ đề' : 'Bật phụ đề')),
-    //     PopupMenuItem(value: 1, child: Text('Ngôn ngữ phụ đề')),
-    //   ],
-    // )
+              _tracks = [...ordered, ...others];
+              setState(() => _loadingTracks = false);
+            }
+            final selected = await showMenu<Map<String,dynamic>>(
+              context: context,
+              position: RelativeRect.fromLTRB(
+                MediaQuery.of(context).size.width - 100,
+                kToolbarHeight + 250,
+                16,
+                0,
+              ),
+              constraints: BoxConstraints(maxHeight: 200),
+              items: _tracks.map((track) {
+                final name = track['displayName'] ?? track['languageName'];
+                final isCurrent = _currentLanguage['languageCode'] == track['languageCode'];
+                return PopupMenuItem(
+                  value: track,
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  child: Row(
+                    children: [
+                      if (isCurrent)
+                        Icon(Icons.check, size: 16, color: Colors.blue),
+                      if (isCurrent)
+                        const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          name,
+                          style: TextStyle(fontSize: 12),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            );
+            if (selected != null) {
+              _controller.setCaptionTrack(selected);
+              setState(() {
+                _captionEnabled = true;
+                _currentLanguage = selected;
+              });
+            }
+          }
+        },
+      );
+
   }
 }

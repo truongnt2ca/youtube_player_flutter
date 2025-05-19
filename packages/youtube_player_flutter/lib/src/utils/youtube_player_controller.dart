@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/services.dart';
@@ -188,11 +189,6 @@ class YoutubePlayerController extends ValueNotifier<YoutubePlayerValue> {
   /// Pauses the video.
   void pause() => _callMethod('pause()');
 
-  /// Toggles captions on/off
-  void toggleCaptions(bool enable) {
-    _callMethod('toggleCaptions(${enable ? 'true' : 'false'})');
-  }
-
   /// Sets subtitle language (e.g. 'en', 'vi', 'ja', ...)
   void setSubtitleLanguage(String lang) {
     _callMethod("setSubtitleLanguage('\$lang')");
@@ -307,21 +303,21 @@ class YoutubePlayerController extends ValueNotifier<YoutubePlayerValue> {
 
   /// Resets the value of [YoutubePlayerController].
   void reset() => updateValue(
-    value.copyWith(
-      isReady: false,
-      isFullScreen: false,
-      isControlsVisible: false,
-      playerState: PlayerState.unknown,
-      hasPlayed: false,
-      position: Duration.zero,
-      buffered: 0.0,
-      errorCode: 0,
-      isLoaded: false,
-      isPlaying: false,
-      isDragging: false,
-      metaData: const YoutubeMetaData(),
-    ),
-  );
+        value.copyWith(
+          isReady: false,
+          isFullScreen: false,
+          isControlsVisible: false,
+          playerState: PlayerState.unknown,
+          hasPlayed: false,
+          position: Duration.zero,
+          buffered: 0.0,
+          errorCode: 0,
+          isLoaded: false,
+          isPlaying: false,
+          isDragging: false,
+          metaData: const YoutubeMetaData(),
+        ),
+      );
 
   @override
   void dispose() {
@@ -345,5 +341,60 @@ class InheritedYoutubePlayer extends InheritedWidget {
   @override
   bool updateShouldNotify(InheritedYoutubePlayer oldWidget) {
     return oldWidget.controller.hashCode != controller.hashCode;
+  }
+}
+
+extension CaptionTrackExt on YoutubePlayerController {
+  /// Trả về danh sách các track phụ đề (raw JSON) từ player.
+  Future<List<Map<String, dynamic>>> getCaptionTrackList() async {
+    if (!value.isReady) throw Exception('Player not ready');
+    // Gọi JS: player.getOption('captions','tracklist')
+    final result = await value.webViewController!.evaluateJavascript(
+        source: "player.getOption('captions','tracklist');");
+    // result thường trả về String JSON hoặc List<dynamic>
+    final raw = result is String ? jsonDecode(result) : result;
+    return List<Map<String, dynamic>>.from(raw);
+  }
+
+  /// Chọn một track subtitles dựa trên toàn bộ object JSON của track
+  void setCaptionTrack(Map<String, dynamic> track) {
+    // Bạn có thể dùng vss_id, languageCode, hoặc nguyên object
+    final js = """
+      player.setOption('captions','track',${jsonEncode(track)});
+    """;
+    _callMethod(js);
+  }
+
+  /// Toggles captions on/off
+  void toggleCaptions(
+      {required bool enable, required Map<String, dynamic> currentLanguage}) {
+    final js = currentLanguage == {}
+        ? """
+          try {
+                if (${!enable}) {
+           // Tắt phụ đề
+              player.unloadModule('captions');
+              player.unloadModule('cc');
+                } else {
+               // Kích hoạt phụ đề (mặc định VI nếu chưa có)
+              player.loadModule('cc');
+              player.setOption('captions', 'track', { languageCode: 'vi' });
+                }
+              } catch (e) {}
+    """
+        : """
+          try {
+                if (${!enable}) {
+           // Tắt phụ đề
+              player.unloadModule('captions');
+              player.unloadModule('cc');
+                } else {
+               // Kích hoạt phụ đề (mặc định VI nếu chưa có)
+              player.loadModule('cc');
+              player.setOption('captions', 'track', ${jsonEncode(currentLanguage)});
+                }
+              } catch (e) {}
+    """;
+    _callMethod(js);
   }
 }

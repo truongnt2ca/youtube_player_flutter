@@ -296,28 +296,14 @@ class _RawYoutubePlayerState extends State<RawYoutubePlayer>
                     sendVideoData(player);
                 }
             }
-            function setSubtitleLanguage(lang) {
-              try {
-        
-                player.setOption('captions', 'track', { languageCode: lang });
-                player.loadModule('captions');
-                player.loadModule('cc');
-              } catch (e) {}
-            }
-            
-            function toggleCaptions(enable) {
-              try {
-                if (!enable) {
-           // Tắt phụ đề
-              player.unloadModule('captions');
-              player.unloadModule('cc');
-                } else {
-               // Kích hoạt phụ đề (mặc định VI nếu chưa có)
-              player.loadModule('cc');
-              player.setOption('captions', 'track', { languageCode: 'vi' });
-                }
-              } catch (e) {}
-            }
+           //  function setSubtitleLanguage(lang) {
+           //    try {
+           // player.unloadModule('captions');
+           //    player.unloadModule('cc');
+           //     player.loadModule('cc');
+           //    player.setOption('captions', 'track', { languageCode: lang });
+           //    } catch (e) {}
+           //  }
 
             function sendVideoData(player) {
                 var videoData = {

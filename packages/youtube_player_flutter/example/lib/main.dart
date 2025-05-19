@@ -83,6 +83,7 @@ class _MyHomePageState extends State<MyHomePage> {
       initialVideoId: _ids.first,
       flags: const YoutubePlayerFlags(
         mute: false,
+        captionLanguage: "vi",
         autoPlay: true,
         disableDragSeek: false,
         loop: false,
@@ -348,17 +349,17 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
             ),
-            IconButton(
-              icon: Icon(!_caption ? Icons.closed_caption : Icons.closed_caption_disabled_outlined,
-              ),
-              onPressed: _isPlayerReady
-                  ? () { _controller.toggleCaptions(_caption);
-                setState(() {
-                  _caption = !_caption;
-                });
-              }
-                  : null,
-            ),
+            // IconButton(
+            //   icon: Icon(!_caption ? Icons.closed_caption : Icons.closed_caption_disabled_outlined,
+            //   ),
+            //   onPressed: _isPlayerReady
+            //       ? () { _controller.toggleCaptions(enable: _caption, );
+            //     setState(() {
+            //       _caption = !_caption;
+            //     });
+            //   }
+            //       : null,
+            // ),
           ],
         ),
       ),
