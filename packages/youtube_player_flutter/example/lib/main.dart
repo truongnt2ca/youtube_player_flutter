@@ -65,7 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _isPlayerReady = false;
   bool _caption = false;
   final List<String> _ids = [
-    'aDbDCYcMWwE',
+    '-4GmbBoYQjE',
     'gQDByCdjUXw',
     'iLnmTe5Q2Qw',
     '_WoCV4c6XOE',
@@ -83,7 +83,7 @@ class _MyHomePageState extends State<MyHomePage> {
       initialVideoId: _ids.first,
       flags: const YoutubePlayerFlags(
         mute: false,
-        captionLanguage: "vi",
+        captionLanguage: "en",
         autoPlay: true,
         disableDragSeek: false,
         loop: false,
@@ -130,6 +130,7 @@ class _MyHomePageState extends State<MyHomePage> {
         SystemChrome.setPreferredOrientations(DeviceOrientation.values);
       },
       player: YoutubePlayer(
+
         controller: _controller,
         showVideoProgressIndicator: true,
         progressIndicatorColor: Colors.blueAccent,

@@ -378,7 +378,7 @@ extension CaptionTrackExt on YoutubePlayerController {
                 } else {
                // Kích hoạt phụ đề (mặc định VI nếu chưa có)
               player.loadModule('cc');
-              player.setOption('captions', 'track', { languageCode: 'vi' });
+              player.setOption('captions', 'track', { languageCode: '${flags.captionLanguage}' });
                 }
               } catch (e) {}
     """
