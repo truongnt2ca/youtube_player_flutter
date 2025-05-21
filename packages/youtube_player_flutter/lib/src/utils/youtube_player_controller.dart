@@ -350,10 +350,17 @@ extension CaptionTrackExt on YoutubePlayerController {
     if (!value.isReady) throw Exception('Player not ready');
     // Gọi JS: player.getOption('captions','tracklist')
     final result = await value.webViewController!.evaluateJavascript(
-        source: "player.getOption('captions','tracklist');");
-    // result thường trả về String JSON hoặc List<dynamic>
+      source: "player.getOption('captions','tracklist');",
+    );
+
+    // Parse result
     final raw = result is String ? jsonDecode(result) : result;
-    return List<Map<String, dynamic>>.from(raw);
+
+    return (raw as List).map((e) {
+      return Map<String, dynamic>.from(
+        (e as Map).map((key, value) => MapEntry(key.toString(), value)),
+      );
+    }).toList();
   }
 
   /// Chọn một track subtitles dựa trên toàn bộ object JSON của track
